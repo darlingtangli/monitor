@@ -12,6 +12,7 @@
 
 ### 示例
 监控接口RpcCallFoo的调用情况：
+```cpp
     // test.cpp
     #include "report.h"
     
@@ -43,6 +44,7 @@
     
         return 0;
     }
+```
 编译指令：
     g++ ./test.cpp -I/usr/local/include -L/usr/local/lib -lmonitor
 
@@ -94,13 +96,16 @@
 **8. ReportCall这个接口怎么这么多参数，能详细说明下使用场景吗？**      
 ReportCall用来监控存在"调用"关系的场景，"调用"包括但不限于本地函数调用、远程过程调用、HTTP请求等。      
 在同步调用模式下，接口使用比较简单。只需要在调用前记录一个时间戳，调用后记录一个时间戳，然后把两个时间戳的差值及调用结果传给ReportCall即可。在异步调用模式下，由于调用开始和结束可能不在同一个地方，要监控调用耗时可能需要一些特殊处理。例如在用libevhtp实现的HTTP Server上，要监控一个HTTP请求的处理耗时及处理结果，在收到HTTP请求时，可以把时间戳记录到request对象里：      
+```cpp
     static void on_request(evhtp_request_t * request, void * arg)
     {
         request->cbarg = (void*)inv::monitor::Timer(); // cbarg字段没有使用，可以用来记录开始处理HTTP请求的时间戳
         // dispatch the request to process handle
         ...
     }
+```
 然后在回包的地方取出request里的时间戳并与当前时间计算时间差值：     
+```cpp
     static void on_request_processed(evhtp_request_t * request, void * arg)
     {
         evhtp_send_reply(request, request->status); // 回包
@@ -110,4 +115,5 @@ ReportCall用来监控存在"调用"关系的场景，"调用"包括但不限于
             request->status==EVHTP_RES_200?inv::monitor::CS_SUCC:inv::monitor::CS_FAILED,
             inv::monitor::Timer() - (uint64_t)request->cbarg);
     }
+```
 
