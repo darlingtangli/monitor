@@ -55,7 +55,7 @@
 性能
 --------------------
 ### 时间性能
-测试环境(192.168.1.17)：4核 1.80GHz CentOS操作系统 metric长度32       
+测试机环境：4核 1.80GHz CentOS操作系统(v6.5) metric长度32       
 单进程测试每秒能调用监控接口的次数数据如下：
 
 |接口|次数/秒|
@@ -99,12 +99,12 @@ ReportCall用来监控存在"调用"关系的场景，"调用"包括但不限于
 ```cpp
     static void on_request(evhtp_request_t * request, void * arg)
     {
-        request->cbarg = (void*)inv::monitor::Timer(); // cbarg字段没有使用，可以用来记录开始处理HTTP请求的时间戳
+        request->timestamp = (void*)inv::monitor::Timer(); 
         // dispatch the request to process handle
         ...
     }
 ```
-然后在回包的地方取出request里的时间戳并与当前时间计算时间差值：     
+然后在回调的地方取出request里的时间戳并与当前时间计算时间差值：     
 ```cpp
     static void on_request_processed(evhtp_request_t * request, void * arg)
     {
@@ -113,7 +113,7 @@ ReportCall用来监控存在"调用"关系的场景，"调用"包括但不限于
             "", 
             "",
             request->status==EVHTP_RES_200?inv::monitor::CS_SUCC:inv::monitor::CS_FAILED,
-            inv::monitor::Timer() - (uint64_t)request->cbarg);
+            inv::monitor::Timer() - (uint64_t)request->timestamp);
     }
 ```
 
