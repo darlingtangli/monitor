@@ -12,22 +12,53 @@ using namespace inv::monitor;
 
 int main(int argc, char* argv[])
 {
-    uint64_t start = Timer();
-    //int cnt = 0;
-    //while (cnt++<10)
+    const int kCycles = 10000000;
+
+    TIME_LABEL(1);
+    for (int i = 0; i < kCycles; i++)
     {
-        for (int i = 0; i < 10000000; i++)
-        {
-            //ReportMax("ab012345678901234567890123456789", i);
-            ReportCall("ab012345678901234567890123456789",
-                    "",
-                    "bar",
-                    CS_SUCC,
-                    i);
-        }
-        //sleep(1);
+        ReportCall("foo.bar.test_report_call",
+                "",
+                "bar",
+                CS_SUCC,
+                i);
     }
-    cout << Timer() - start << endl;
+    cout << "ReportCall:    " << uint64_t(1000000)*kCycles/TIME_DIFF(1) << endl;
+
+    TIME_LABEL(2);
+    for (int i = 0; i < kCycles; i++)
+    {
+        ReportIncr("foo.bar.test_report_incr");
+    }
+    cout << "ReportIncr:    " << uint64_t(1000000)*kCycles/TIME_DIFF(2) << endl;
+
+    TIME_LABEL(3);
+    for (int i = 0; i < kCycles; i++)
+    {
+        ReportStatics("foo.bar.test_report_statics", i);
+    }
+    cout << "ReportStatics: " << uint64_t(1000000)*kCycles/TIME_DIFF(3) << endl;
+
+    TIME_LABEL(4);
+    for (int i = 0; i < kCycles; i++)
+    {
+        ReportAvg("foo.bar.test_report_avg", i);
+    }
+    cout << "ReportAvg:     " << uint64_t(1000000)*kCycles/TIME_DIFF(4) << endl;
+
+    TIME_LABEL(5);
+    for (int i = 0; i < kCycles; i++)
+    {
+        ReportMin("foo.bar.test_report_min", i);
+    }
+    cout << "ReportMin:     " << uint64_t(1000000)*kCycles/TIME_DIFF(5) << endl;
+
+    TIME_LABEL(6);
+    for (int i = 0; i < kCycles; i++)
+    {
+        ReportMax("foo.bar.test_report_max", i);
+    }
+    cout << "ReportMax:     " << uint64_t(1000000)*kCycles/TIME_DIFF(6) << endl;
 
     return 0;
 }

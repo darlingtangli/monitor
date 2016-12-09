@@ -33,13 +33,17 @@
             {
                 status = CS_EXCEPTION;              // 调用被异常中断
             }
-            ReportCall("xz.gate.RpcCallFoo",   // 上报指标名
+            ReportCall("xz.gate.RpcCallFoo",        // 上报指标名
                     "",                             // 主调模块名，空串表示使用进程映像文件名
                     "Bar",                          // 被调用模块名"Bar"
                     status,                         // 调用结果
                     TIME_DIFF(1));                  // 与标记时间点1的时间差
 
-            ReportIncr("xz.gate.xxxx.cycles"); // 上报递增量
+        }
+
+        for (int i = 0; i < 100; i++)
+        {
+            ReportIncr("xz.gate.xxxx.cycles");      // 上报递增量，指标"xz.gate.xxxx.cycles"值为100
         }
     
         return 0;
@@ -51,6 +55,7 @@
 ### 辅助工具
 **ipcrm.sh** 删除监控上报使用的共享内存       
 **mtool** 查看/清零共享内存中上报的监控数据
+**mreport** 用于shell脚本上报
 
 性能
 --------------------
