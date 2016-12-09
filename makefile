@@ -37,6 +37,9 @@ $(testexe) : %.o : %.cc
 $(mtoolexe) : %.o : %.cc
 	$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
 
+$(mreportexe) : %.o : %.cc
+	$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
+
 install :
 	cp ./include/* /usr/local/include/
 	cp ./lib/* /usr/local/lib/
