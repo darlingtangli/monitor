@@ -9,53 +9,41 @@
 #define __SHM_DATA_H
 
 #include <stdint.h>
-#include "static_assert.h"
 
 #define MAX_NAME_LEN 64
 
-namespace inv 
-{
-
-namespace monitor
-{
 #pragma pack(1)
 
 // 共享内存区头部信息
-struct Head
-{
+typedef struct moni_head_s {
     uint8_t  magic[8];  // magic number: 'MONITOR'
-    uint8_t  lock;      // simple spin lock,用于增加Entry时上锁
+    uint8_t  lock;      // simple spin lock,用于增加entry时上锁
     uint16_t version;   // 版本号
     uint32_t capcity;   // 共享内存区大小
     uint32_t offset;    // 上报属性表偏移
     uint32_t entries;   // 上报属性数
-};
+} moni_head_t;
 
 // 上报属性类型
-enum AttrType
-{
+typedef enum moni_attr_e {
     AT_CALL    = 0, // 接口调用
     AT_INCR    = 1, // 递增量
     AT_STATICS = 2, // 稳定量
     AT_AVG     = 3, // 平均值
     AT_MIN     = 4, // 最大值
     AT_MAX     = 5, // 最小值
-};
+} moni_attr_t;
 
-struct Entry
-{
-    union
-    {
+typedef struct entry_s {
+    union {
         ///////////////////// 上报属性数据区 /////////////////////////////
-        struct{
-            AttrType type;
-            uint32_t instance_id;           // 上报的实例进程ID，和进程的映像文件的路径一一对应
-            uint8_t  metric[MAX_NAME_LEN];  // 上报的指标名
-            union Record
-            {
+        struct {
+            moni_attr_t type;
+            uint32_t    instance_id;           // 上报的实例进程ID，和进程的映像文件的路径一一对应
+            uint8_t     metric[MAX_NAME_LEN];  // 上报的指标名
+            union {
                 // AT_CALL
-                struct
-                {
+                struct {
                     uint8_t  caller[MAX_NAME_LEN]; // 主调服务名
                     uint8_t  callee[MAX_NAME_LEN]; // 被调服务名
                     uint32_t count;                // 调用总次数
@@ -88,30 +76,14 @@ struct Entry
                             // 调整这个值
 
     };
-
-    // 没什么用，就是用来保证block的size设置得不小于data的size，否则会有编译错误
-    void Dummy() {MY_STATIC_ASSERT(sizeof(this->block)>=sizeof(this->data));}
-};
+} moni_entry_t;
 
 #pragma pack()
 
-inline uint16_t MakeVersion(uint8_t high, uint8_t low)
-{
-    return ((uint16_t)high<<8)|low;
-}
+#define moni_make_version(high, low) (((uint16_t)high<<8)|low)
 
-inline Head* GetHead(void* addr)
-{
-    return (Head*)addr;
-}
+#define moni_get_head(addr) ((moni_head_t*)addr)
 
-inline Entry* GetEntry(void* addr, int index)
-{
-    return &((Entry*)((char*)addr+(((Head*)addr)->offset)))[index];
-}
-
-} // namespace monitor
-
-} // namespace inv
+#define moni_get_entry(addr, index) (&((moni_entry_t*)((char*)addr+(((moni_head_t*)addr)->offset)))[index])
 
 #endif // __SHM_DATA_H

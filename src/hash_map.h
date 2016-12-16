@@ -9,35 +9,23 @@
 #define __HASH_MAP_H
 
 #include <stdint.h>
-#include <string>
 
-namespace inv 
-{
+/* NOTE: 确保BUCKET_NUM大于共享内存最大能支持的指标数，否则会导致冲突率升高而降低性能 */
+#define BUCKET_NUM 249989
+#define RAW 0xFFFFFFFF
+#define MAX_KEY_LEN 64
 
-namespace monitor
-{
+typedef const char* moni_hash_key_t;
+typedef uint32_t moni_hash_value_t;
+typedef int (*moni_hash_check_t)(moni_hash_key_t, moni_hash_value_t);
 
-class HashMap
-{
-public:
-    // NOTE: 确保BUCKET_NUM大于共享内存最大能支持的指标数，否则会导致冲突率升高而降低性能
-    static const uint32_t BUCKET_NUM = 249989; 
-    static const uint32_t RAW = -1;
+typedef struct moni_hast_map_s {
+    moni_hash_value_t bucket[BUCKET_NUM];
+    moni_hash_check_t check_cb;
+} moni_hash_map_t;
 
-public:
-    HashMap(void* addr);
-
-    int Get(const std::string& key);
-    int Set(const std::string& key, uint32_t value);
-
-private:
-    uint32_t _table[BUCKET_NUM];
-    void*    _shm_data_addr;
-
-};
-
-} // namespace monitor
-
-} // namespace inv
+void moni_hash_map_init(moni_hash_map_t* hmap, moni_hash_check_t check_cb);
+int  moni_hash_map_get (moni_hash_map_t* hmap, moni_hash_key_t key);
+int  moni_hash_map_set (moni_hash_map_t* hmap, moni_hash_key_t key, moni_hash_value_t value);
 
 #endif // __HASH_MAP_H

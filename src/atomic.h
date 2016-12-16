@@ -8,25 +8,6 @@
 #ifndef __ATOMIC_H
 #define __ATOMIC_H
 
-namespace inv 
-{
-
-namespace monitor
-{
-
-struct Atomic
-{
-
-template <typename T>
-static T Add(T* ptr, T value)
-{
-    return __sync_add_and_fetch(ptr, value);
-}
-
-};
-
-} // namespace monitor
-
-} // namespace inv
+#define moni_atomic_add(ptr, value) __sync_add_and_fetch(ptr, value)
 
 #endif // __ATOMIC_H

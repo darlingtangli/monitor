@@ -3,6 +3,7 @@
 #include <strings.h>
 #include "report.h"
 
+using namespace std;
 using namespace inv::monitor;
 
 int main(int argc, char* argv[])

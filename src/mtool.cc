@@ -8,18 +8,20 @@
 #include <sstream>
 #include <string>
 #include <iomanip>
+
+extern "C"
+{
 #include "shm_data.h"
+}
 
 using namespace std;
-using namespace inv::monitor;
 
-const char*    MAGIC        = "MONITOR";
 const uint32_t SHM_KEY      = 0xABCD0605;   
 const uint32_t SHM_CAPCITY  = 10*1024*1024; // 10MB
 
 void Show(void* shmaddr)
 {
-    Head* head = GetHead(shmaddr);
+    moni_head_t* head = moni_get_head(shmaddr);
     // find proper width for formatted output
     int width = 8;
     int metric_width = 8;
@@ -28,7 +30,7 @@ void Show(void* shmaddr)
     int len = 0;
     for (uint32_t i = 0; i < head->entries; i++)
     {
-        Entry* entry = GetEntry(shmaddr, i);
+        moni_entry_t* entry = moni_get_entry(shmaddr, i);
         len = strlen((char*)entry->data.metric);
         if (len > metric_width) metric_width = len;
         if (entry->data.type == AT_CALL)
@@ -64,7 +66,7 @@ void Show(void* shmaddr)
     stringstream ss_max;
     for (uint32_t i = 0; i < head->entries; i++)
     {
-        Entry* entry = GetEntry(shmaddr, i);
+        moni_entry_t* entry = moni_get_entry(shmaddr, i);
 
         switch (entry->data.type)
         {
@@ -77,10 +79,10 @@ void Show(void* shmaddr)
                             << setw(metric_width+1) << entry->data.metric
                             << setw(caller_width+1) << entry->data.record.call.caller
                             << setw(callee_width+1) << entry->data.record.call.callee
-                            << setw(width)          << entry->data.record.call.count      
-                            << setw(width)          << entry->data.record.call.succ       
-                            << setw(width)          << entry->data.record.call.count-entry->data.record.call.succ-entry->data.record.call.exception       
-                            << setw(width)          << entry->data.record.call.exception  
+                            << setw(width+2)          << entry->data.record.call.count      
+                            << setw(width+2)          << entry->data.record.call.succ       
+                            << setw(width+2)          << entry->data.record.call.count-entry->data.record.call.succ-entry->data.record.call.exception       
+                            << setw(width+2)          << entry->data.record.call.exception  
                             << setw(width+8)        << entry->data.record.call.cost_us    
                             << setw(width+1)        << entry->data.record.call.cost_min_us
                             << setw(width+1)        << entry->data.record.call.cost_max_us
@@ -153,8 +155,8 @@ void Show(void* shmaddr)
         cout << "----------- call data ------------" << endl
              << setw(width) << "index" << setw(width) << "type" << setw(width+4) << "inst" 
              << setw(metric_width+1) << "metric" << setw(caller_width+1) << "caller"
-             << setw(callee_width+1) << "callee" << setw(width) << "count" << setw(width) << "succ" 
-             << setw(width) << "fail" << setw(width) << "ex" << setw(width+8) << "cost_us" << setw(width+1) << "min" 
+             << setw(callee_width+1) << "callee" << setw(width+2) << "count" << setw(width+2) << "succ" 
+             << setw(width+2) << "fail" << setw(width+2) << "ex" << setw(width+8) << "cost_us" << setw(width+1) << "min" 
              << setw(width+1) << "max" << setw(width+1) << "avg" << endl
              << ss_call.str() << endl;
 
@@ -208,11 +210,11 @@ void Show(void* shmaddr)
 
 void Clear(void* shmaddr)
 {
-    Head* head = GetHead(shmaddr);
+    moni_head_t* head = moni_get_head(shmaddr);
 
     for (uint32_t i = 0; i < head->entries; i++)
     {
-        Entry* entry = GetEntry(shmaddr, i);
+        moni_entry_t* entry = moni_get_entry(shmaddr, i);
 
         switch (entry->data.type)
         {

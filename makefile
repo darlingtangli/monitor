@@ -1,49 +1,65 @@
 TARGET_LIB=./lib/libmonitor.a
-TEST=./bin/test
 MTOOL=./bin/mtool
 MREPORT=./bin/mreport
-CC=g++ 
-CFLAGS=-Wall -Wno-deprecated -O2
+TEST1=./bin/test1
+TEST2=./bin/test2
 
-INCLUDE = -I ./include/
+CC=gcc
+CFLAGS=-Wall -Wno-deprecated -O2 -DNDEBUG
+CXX=g++
+CXXFLAGS=-Wall -Wno-deprecated -O2
 LIBS=-pthread
 
-objects = ./src/report_impl.o ./src/initiator.o ./src/hash_map.o ./src/hash.o
+INCLUDE = -I ./include/
 
-testexe = ./src/test.o 
-mtoolexe = ./src/mtool.o
-mreportexe = ./src/mreport.o
+COBJS = ./src/report_impl.o ./src/loader.o ./src/hash_map.o ./src/spin_lock.o
+MTOOLOBJS = ./src/mtool.o
+MREPORTOBJS = ./src/mreport.o
+TEST1OBJS = ./src/test1.o
+TEST2OBJS = ./src/test2.o
 
-all : $(TARGET_LIB) $(TEST) $(MTOOL) $(MREPORT)
+all : $(TARGET_LIB) $(MTOOL) $(MREPORT) $(TEST1) $(TEST2)
 
-$(TARGET_LIB) : $(objects)
+$(TARGET_LIB) : $(COBJS)
 	ar cr $@ $^
 
-$(TEST) : $(testexe) $(TARGET_LIB)
-	$(CC) $(CFLAGS) $(INCLUDE) -o $@ $^ $(LIBS)
-
-$(MTOOL) : $(mtoolexe)
-	$(CC) $(CFLAGS) $(INCLUDE) -o $@ $^
-
-$(MREPORT) : $(mreportexe) $(TARGET_LIB)
-	$(CC) $(CFLAGS) $(INCLUDE) -o $@ $^
-
-$(objects) : %.o : %.cc
+$(COBJS) : %.o : %.c
 	$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
 
-$(testexe) : %.o : %.cc
-	$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
+$(MTOOL) : $(MTOOLOBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(INCLUDE)
 
-$(mtoolexe) : %.o : %.cc
-	$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
+$(MREPORT) : $(MREPORTOBJS) $(TARGET_LIB)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(INCLUDE)
 
-$(mreportexe) : %.o : %.cc
-	$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
+$(TEST1) : $(TEST1OBJS) $(TARGET_LIB)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(INCLUDE) $(LIBS)
+
+$(TEST2) : $(TEST2OBJS) $(TARGET_LIB)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(INCLUDE) $(LIBS)
+
+$(MTOOLOBJS) : %.o : %.cc
+	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
+
+$(MREPORTOBJS) : %.o : %.cc
+	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
+
+$(TEST1OBJS) : %.o : %.cc
+	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
+
+$(TEST2OBJS) : %.o : %.cc
+	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
 
 install :
-	cp ./include/* /usr/local/include/
-	cp ./lib/* /usr/local/lib/
+	cp ./include/report.h /usr/local/include/
+	cp ./lib/libmonitor.a /usr/local/lib/
 	cp ./bin/mtool ./bin/mreport /usr/local/bin/
 
+uninstall :
+	rm /usr/local/include/report.h
+	rm /usr/local/lib/libmonitor.a
+	rm /usr/local/bin/mtool
+	rm /usr/local/bin/mreport
+
 clean :
-	rm -rf ./src/*.o ./lib/* ./bin/* 
+	rm -rf ./src/*.o $(TARGET_LIB) $(MTOOL) $(MREPORT) $(TEST1) $(TEST2)
