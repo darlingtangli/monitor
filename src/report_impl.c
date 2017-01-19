@@ -15,8 +15,7 @@
 static moni_spin_lock_t __lock = UNLOCK;
 
 // 为进程上报的属性找出其的entry号
-static uint32_t __moni_get_entry_index(const char* metric, moni_attr_t type)
-{
+static uint32_t __moni_get_entry_index(const char* metric, moni_attr_t type) {
     int  i;
     uint32_t index;
     moni_head_t* head;
@@ -85,8 +84,7 @@ static uint32_t __moni_get_entry_index(const char* metric, moni_attr_t type)
     return index;
 }
 
-uint64_t moni_timer()
-{
+uint64_t moni_timer() {
     // NOTE: 使用gettimeofday来计时的原因：1. 精度足够；2. 高效；3. 线程安全
     // 历史上gettimeofday似乎并不是线程安全的，并且系统调用很慢，common库中的inv_timeprovider使用了锁来保证线程安全，
     // 在Linux系统上现在已无必要。
@@ -102,8 +100,7 @@ void moni_report_call(const char* metric,
         const char* caller,          
         const char* callee,          
         moni_call_status_t status,                  
-        uint64_t cost_us)  
-{
+        uint64_t cost_us) {
     if (!moni_status) return;
 
     uint32_t index = __moni_get_entry_index(metric, AT_CALL);
@@ -114,16 +111,14 @@ void moni_report_call(const char* metric,
     moni_entry_t* entry = moni_get_entry(moni_shmaddr, index);
     entry->data.type = AT_CALL;
     // caller
-    if (!entry->data.record.call.caller[0])
-    {
+    if (!entry->data.record.call.caller[0]) {
         strncpy((char*)entry->data.record.call.caller, 
                 strlen(caller) ? caller : moni_base_name,  // caller为空串则用进程映像文件名代替
                 sizeof(entry->data.record.call.caller));
         entry->data.record.call.caller[sizeof(entry->data.record.call.caller)-1] = '\0';
     }
     // callee
-    if (!entry->data.record.call.callee[0])
-    {
+    if (!entry->data.record.call.callee[0]) {
         strncpy((char*)entry->data.record.call.callee, callee, sizeof(entry->data.record.call.callee));
         entry->data.record.call.callee[sizeof(entry->data.record.call.callee)-1] = '\0';
     }
@@ -138,20 +133,16 @@ void moni_report_call(const char* metric,
     // count
     moni_atomic_add(&entry->data.record.call.count, 1);
     // succ exception
-    switch (status)
-    {
-        case MCS_SUCC:
-        {
+    switch (status) {
+        case MCS_SUCC: {
             moni_atomic_add(&entry->data.record.call.succ, 1);
             break;
         }
-        case MCS_EXCEPTION:
-        {
+        case MCS_EXCEPTION: {
             moni_atomic_add(&entry->data.record.call.exception, 1);
             break;
         }
-        case MCS_FAILED:
-        {
+        case MCS_FAILED: {
             // nothing to do 
             // failed = count - succ - exception
             break;
@@ -160,21 +151,18 @@ void moni_report_call(const char* metric,
     // cost_us
     moni_atomic_add(&entry->data.record.call.cost_us, cost_us);
     // cost_min_us
-    if (cost_us < entry->data.record.call.cost_min_us)
-    {
+    if (cost_us < entry->data.record.call.cost_min_us) {
         entry->data.record.call.cost_min_us = cost_us;
     }
     // cost_max_us
-    if (cost_us > entry->data.record.call.cost_max_us)
-    {
+    if (cost_us > entry->data.record.call.cost_max_us) {
         entry->data.record.call.cost_max_us = cost_us;
     }
 
     return;
 }
 
-void moni_report_incr(const char* metric, uint64_t step)
-{
+void moni_report_incr(const char* metric, uint64_t step) {
     if (!moni_status) return;
 
     uint32_t index = __moni_get_entry_index(metric, AT_INCR);
@@ -187,8 +175,7 @@ void moni_report_incr(const char* metric, uint64_t step)
     return;
 }
 
-void moni_report_statics(const char* metric, uint64_t value)
-{
+void moni_report_statics(const char* metric, uint64_t value) {
     if (!moni_status) return;
 
     uint32_t index = __moni_get_entry_index(metric, AT_STATICS);
@@ -201,8 +188,7 @@ void moni_report_statics(const char* metric, uint64_t value)
     return;
 }
 
-void moni_report_avg(const char* metric, uint64_t value)
-{
+void moni_report_avg(const char* metric, uint64_t value) {
     if (!moni_status) return;
 
     uint32_t index = __moni_get_entry_index(metric, AT_AVG);
@@ -216,8 +202,7 @@ void moni_report_avg(const char* metric, uint64_t value)
     return;
 }
 
-void moni_report_min(const char* metric, uint64_t value)
-{
+void moni_report_min(const char* metric, uint64_t value) {
     if (!moni_status) return;
 
     uint32_t index = __moni_get_entry_index(metric, AT_MIN);
@@ -230,8 +215,7 @@ void moni_report_min(const char* metric, uint64_t value)
     return;
 }
 
-void moni_report_max(const char* metric, uint64_t value)
-{
+void moni_report_max(const char* metric, uint64_t value) {
     if (!moni_status) return;
 
     uint32_t index = __moni_get_entry_index(metric, AT_MAX);
@@ -244,8 +228,7 @@ void moni_report_max(const char* metric, uint64_t value)
     return;
 }
 
-void moni_simple_hash(const char* str, char* buf, int len)
-{
+void moni_simple_hash(const char* str, char* buf, int len) {
     uint32_t hash;
     moni_bkdr_hash(str, &hash);
     snprintf(buf, len, "%d", hash % 999983);
@@ -253,12 +236,10 @@ void moni_simple_hash(const char* str, char* buf, int len)
     return;
 }
 
-const char* moni_process_image_name()
-{
+const char* moni_process_image_name() {
     return moni_base_name;
 }
 
-const char* moni_version()
-{
+const char* moni_version() {
     return "1.0";
 }

@@ -37,14 +37,12 @@ extern uint64_t shm_lock_spins;
 extern uint64_t shm_lock_max_spins;
 #endif
 
-static int __moni_check_shm_metric(moni_hash_key_t key, moni_hash_value_t value)
-{
+static int __moni_check_shm_metric(moni_hash_key_t key, moni_hash_value_t value) {
     moni_entry_t* entry = moni_get_entry(moni_shmaddr, value);
     return !strncmp((char*)entry->data.metric, key, sizeof(entry->data.metric)-1);
 }
 
-void moni_load()
-{
+void moni_load() {
     char         path[256];
     int          shmid;
     moni_head_t* head;

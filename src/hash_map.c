@@ -12,15 +12,13 @@ uint64_t hash_map_get_conflics = 0;
 uint64_t hash_map_get_count    = 0;
 #endif
 
-void moni_hash_map_init(moni_hash_map_t* hmap, moni_hash_check_t check_cb)
-{
+void moni_hash_map_init(moni_hash_map_t* hmap, moni_hash_check_t check_cb) {
     memset(&hmap->bucket[0], RAW, sizeof(hmap->bucket));
     hmap->check_cb = check_cb;
     return;
 }
 
-int moni_hash_map_get(moni_hash_map_t* hmap, const char* key)
-{
+int moni_hash_map_get(moni_hash_map_t* hmap, const char* key) {
     uint32_t cnt;
     uint32_t hash;
     uint32_t i;
@@ -42,8 +40,7 @@ int moni_hash_map_get(moni_hash_map_t* hmap, const char* key)
     return -1;
 }
 
-int moni_hash_map_set(moni_hash_map_t* hmap, const char* key, uint32_t value)
-{
+int moni_hash_map_set(moni_hash_map_t* hmap, const char* key, uint32_t value) {
     uint32_t cnt;
     uint32_t hash;
     uint32_t i;

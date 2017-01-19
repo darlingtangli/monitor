@@ -12,14 +12,12 @@ using namespace inv::monitor;
 
 int test_metrics_size = 1000;
 
-void* ThreadFunc(void* arg)
-{
+void* ThreadFunc(void* arg) {
     const int kCycles = 10000000;
     int tid = *(int*)arg;
 
     TIME_LABEL(1);
-    for (int i = 0; i < kCycles; i++)
-    {
+    for (int i = 0; i < kCycles; i++) {
 #if TEST_C_API
         moni_report_incr(metrics[i%test_metrics_size], 1);
 #else
@@ -39,8 +37,7 @@ int main(int argc, char* argv[])
     
     pthread_t* threads = new pthread_t[thread_num];
     int* tids = new int[thread_num];
-    for (int i = 0; i < thread_num; i++)
-    {
+    for (int i = 0; i < thread_num; i++) {
         tids[i] = i;
         int ret = pthread_create(threads+i, NULL, ThreadFunc, tids+i);
         if (ret)
@@ -50,8 +47,7 @@ int main(int argc, char* argv[])
         }
     }
 
-    for (int i = 0; i < thread_num; i++)
-    {
+    for (int i = 0; i < thread_num; i++) {
         pthread_join(threads[i], NULL);
     }
 

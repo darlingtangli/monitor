@@ -19,8 +19,7 @@ void*    shm_lock                = NULL;
 #endif
 
 // acquire
-void moni_spin_lock(moni_spin_lock_t* lock)
-{
+void moni_spin_lock(moni_spin_lock_t* lock) {
 #ifndef NDEBUG
     moni_head_t *head;
     uint64_t *spins = NULL;
@@ -59,7 +58,6 @@ void moni_spin_lock(moni_spin_lock_t* lock)
 } 
 
 // release
-void moni_spin_unlock(moni_spin_lock_t* lock)
-{                             
+void moni_spin_unlock(moni_spin_lock_t* lock) {                             
     __sync_lock_release(lock); 
 }

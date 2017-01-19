@@ -58,8 +58,7 @@ typedef struct entry_s {
                 // AT_STATICS
                 uint64_t statics;
                 // AT_AVG
-                struct
-                {
+                struct {
                     uint64_t sum;
                     uint64_t count;
                 } avg;

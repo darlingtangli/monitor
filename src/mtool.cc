@@ -19,8 +19,7 @@ using namespace std;
 const uint32_t SHM_KEY      = 0xABCD0605;   
 const uint32_t SHM_CAPCITY  = 10*1024*1024; // 10MB
 
-void Show(void* shmaddr)
-{
+void Show(void* shmaddr) {
     moni_head_t* head = moni_get_head(shmaddr);
     // find proper width for formatted output
     int width = 8;
@@ -28,13 +27,11 @@ void Show(void* shmaddr)
     int caller_width = 8;
     int callee_width = 8;
     int len = 0;
-    for (uint32_t i = 0; i < head->entries; i++)
-    {
+    for (uint32_t i = 0; i < head->entries; i++) {
         moni_entry_t* entry = moni_get_entry(shmaddr, i);
         len = strlen((char*)entry->data.metric);
         if (len > metric_width) metric_width = len;
-        if (entry->data.type == AT_CALL)
-        {
+        if (entry->data.type == AT_CALL) {
             len = strlen((char*)entry->data.record.call.caller);
             if (len > caller_width) caller_width = len;
             len = strlen((char*)entry->data.record.call.callee);
@@ -64,14 +61,11 @@ void Show(void* shmaddr)
     stringstream ss_avg;
     stringstream ss_min;
     stringstream ss_max;
-    for (uint32_t i = 0; i < head->entries; i++)
-    {
+    for (uint32_t i = 0; i < head->entries; i++) {
         moni_entry_t* entry = moni_get_entry(shmaddr, i);
 
-        switch (entry->data.type)
-        {
-            case AT_CALL:
-                {
+        switch (entry->data.type) {
+            case AT_CALL: {
                     ss_call.flags(ios::left);
                     ss_call << setw(width) << i                       
                             << setw(width) << entry->data.type        
@@ -90,8 +84,7 @@ void Show(void* shmaddr)
                             << endl;
                     break;
                 }
-            case AT_INCR:
-                {
+            case AT_INCR: {
                     ss_incr.flags(ios::left);
                     ss_incr << setw(width) << i                       
                             << setw(width) << entry->data.type        
@@ -101,8 +94,7 @@ void Show(void* shmaddr)
                             << endl;
                     break;
                 }
-            case AT_STATICS:
-                {
+            case AT_STATICS: {
                     ss_stat.flags(ios::left);
                     ss_stat << setw(width) << i                       
                             << setw(width) << entry->data.type        
@@ -112,8 +104,7 @@ void Show(void* shmaddr)
                             << endl;
                     break;
                 }
-            case AT_AVG:
-                {
+            case AT_AVG: {
                     ss_avg.flags(ios::left);
                     ss_avg << setw(width) << i                       
                            << setw(width) << entry->data.type        
@@ -125,8 +116,7 @@ void Show(void* shmaddr)
                            << endl;
                     break;
                 }
-            case AT_MIN:
-                {
+            case AT_MIN: {
                     ss_min.flags(ios::left);
                     ss_min << setw(width) << i                       
                            << setw(width) << entry->data.type        
@@ -136,8 +126,7 @@ void Show(void* shmaddr)
                            << endl;
                     break;
                 }
-            case AT_MAX:
-                {
+            case AT_MAX: {
                     ss_max.flags(ios::left);
                     ss_max << setw(width) << i                       
                            << setw(width) << entry->data.type        
@@ -150,8 +139,7 @@ void Show(void* shmaddr)
         }
     }
     // output call
-    if (ss_call.str().length())
-    {
+    if (ss_call.str().length()) {
         cout << "----------- call data ------------" << endl
              << setw(width) << "index" << setw(width) << "type" << setw(width+4) << "inst" 
              << setw(metric_width+1) << "metric" << setw(caller_width+1) << "caller"
@@ -162,24 +150,21 @@ void Show(void* shmaddr)
 
     }
     // output incr
-    if (ss_incr.str().length())
-    {
+    if (ss_incr.str().length()) {
         cout << "----------- incr data ------------" << endl
              << setw(width) << "index" << setw(width) << "type" << setw(width+4) << "inst" 
              << setw(metric_width+1) << "metric" << setw(width+1) << "incr" << endl
              << ss_incr.str() << endl;
     }
     // output stat
-    if (ss_stat.str().length())
-    {
+    if (ss_stat.str().length()) {
         cout << "----------- stat data ------------" << endl
              << setw(width) << "index" << setw(width) << "type" << setw(width+4) << "inst" 
              << setw(metric_width+1) << "metric" << setw(width+1) << "statics" << endl
              << ss_stat.str() << endl;
     }
     // output avg
-    if (ss_avg.str().length())
-    {
+    if (ss_avg.str().length()) {
         cout << "----------- avg  data ------------" << endl
              << setw(width) << "index" << setw(width) << "type" << setw(width+4) << "inst" 
              << setw(metric_width+1) << "metric" << setw(width+13) << "sum" 
@@ -187,16 +172,14 @@ void Show(void* shmaddr)
              << ss_avg.str() << endl;
     }
     // output min
-    if (ss_min.str().length())
-    {
+    if (ss_min.str().length()) {
         cout << "----------- min  data ------------" << endl
              << setw(width) << "index" << setw(width) << "type" << setw(width+4) << "inst" 
              << setw(metric_width+1) << "metric" << setw(width+1) << "min" << endl
              << ss_min.str() << endl;
     }
     // output max
-    if (ss_max.str().length())
-    {
+    if (ss_max.str().length()) {
         cout << "----------- max  data ------------" << endl
              << setw(width) << "index" << setw(width) << "type" << setw(width+4) << "inst" 
              << setw(metric_width+1) << "metric" << setw(width+1) << "max" << endl
@@ -208,18 +191,14 @@ void Show(void* shmaddr)
     return;
 }
 
-void Clear(void* shmaddr)
-{
+void Clear(void* shmaddr) {
     moni_head_t* head = moni_get_head(shmaddr);
 
-    for (uint32_t i = 0; i < head->entries; i++)
-    {
+    for (uint32_t i = 0; i < head->entries; i++) {
         moni_entry_t* entry = moni_get_entry(shmaddr, i);
 
-        switch (entry->data.type)
-        {
-            case AT_CALL:
-                {
+        switch (entry->data.type) {
+            case AT_CALL: {
                     entry->data.record.call.count     = 0;
                     entry->data.record.call.succ      = 0;
                     entry->data.record.call.exception = 0;
@@ -228,29 +207,24 @@ void Clear(void* shmaddr)
                     entry->data.record.call.cost_max_us = 0;
                     break;
                 }
-            case AT_INCR:
-                {
+            case AT_INCR: {
                     entry->data.record.incr = 0;
                     break;
                 }
-            case AT_STATICS:
-                {
+            case AT_STATICS: {
                     entry->data.record.statics = 0;
                     break;
                 }
-            case AT_AVG:
-                {
+            case AT_AVG: {
                     entry->data.record.avg.sum   = 0;
                     entry->data.record.avg.count = 0;
                     break;
                 }
-            case AT_MIN:
-                {
+            case AT_MIN: {
                     entry->data.record.min = -1;
                     break;
                 }
-            case AT_MAX:
-                {
+            case AT_MAX: {
                     entry->data.record.max = 0;
                     break;
                 }
@@ -259,10 +233,8 @@ void Clear(void* shmaddr)
     return;
 }
 
-int main(int argc, char* argv[])
-{
-    if (argc < 2)
-    {
+int main(int argc, char* argv[]) {
+    if (argc < 2) {
         printf("usage: %s -[sc]\n", argv[0]);
         printf("  -s Show SHM data\n");
         printf("  -c Clear SHM data\n");
@@ -270,31 +242,25 @@ int main(int argc, char* argv[])
     }
 
     int shmid = shmget(SHM_KEY, SHM_CAPCITY, 0666); 
-    if (-1 == shmid)
-    {
+    if (-1 == shmid) {
         fprintf(stderr, "error: shmget failed, shmid: %d, errno: %d.\n", shmid, errno);
         return 0;
     }
     void* shmaddr = shmat(shmid, NULL, 0);
-    if ((void*)-1 == shmaddr)
-    {
+    if ((void*)-1 == shmaddr) {
         fprintf(stderr, "error: shmat failed, shmid: %d, errno: %d.\n", shmid, errno);
         return 0;
     }
     fprintf(stderr, "info: get shm for monitor api info succ, id: %d.\n", shmid);
 
     int opt;
-    while ((opt = getopt(argc, argv, "sc")) != -1) 
-    {
-        switch (opt)
-        {
-            case 's':
-                {
+    while ((opt = getopt(argc, argv, "sc")) != -1) {
+        switch (opt) {
+            case 's': {
                     Show(shmaddr);
                     break;
                 }
-            case 'c':
-                {
+            case 'c': {
                     Clear(shmaddr);
                     break;
                 }

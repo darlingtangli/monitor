@@ -5,9 +5,9 @@ TEST1=./bin/test1
 TEST2=./bin/test2
 
 CC=gcc
-CFLAGS=-Wall -Wno-deprecated -O2 -DNDEBUG
+CFLAGS=-Wall -O2 -DNDEBUG
 CXX=g++
-CXXFLAGS=-Wall -Wno-deprecated -O2
+CXXFLAGS=-Wall -O2
 LIBS=-pthread
 
 INCLUDE = -I ./include/
