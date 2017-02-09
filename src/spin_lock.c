@@ -1,5 +1,6 @@
 #include "spin_lock.h"
 
+#include <stdio.h>
 #include <sched.h>
 
 #ifndef NDEBUG
@@ -20,11 +21,11 @@ void*    shm_lock                = NULL;
 
 // acquire
 void moni_spin_lock(moni_spin_lock_t* lock) {
+    uint64_t cnt = 1;
 #ifndef NDEBUG
     moni_head_t *head;
     uint64_t *spins = NULL;
     uint64_t *calls = NULL;
-    uint64_t cnt = 1;
     if (!shm_lock) {
         head = moni_get_head(moni_shmaddr);
         shm_lock = &head->lock;
@@ -47,9 +48,14 @@ void moni_spin_lock(moni_spin_lock_t* lock) {
     while (__sync_lock_test_and_set(lock, LOCK)) {             
 #ifndef NDEBUG
     moni_atomic_add(spins, 1);
-    moni_atomic_add(&cnt, 1);
 #endif
         sched_yield();                                          
+        // 设置最大尝试次数，防止死锁
+        // 当共享内存中的lock置1后，如果进程异常退出，lock不会被置1，这种情况下会导致死锁
+        if (cnt++ > 10000) {
+            fprintf(stderr, "warn: dead lock may occur, lock: %p.\n");
+            break;
+        }
     }                                                           
 #ifndef NDEBUG
     if (lock == hash_map_lock && cnt > hash_map_lock_max_spins) hash_map_lock_max_spins = cnt;
