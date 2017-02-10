@@ -53,7 +53,7 @@ void moni_spin_lock(moni_spin_lock_t* lock) {
         // 设置最大尝试次数，防止死锁
         // 当共享内存中的lock置1后，如果进程异常退出，lock不会被置1，这种情况下会导致死锁
         if (cnt++ > 10000) {
-            fprintf(stderr, "warn: dead lock may occur, lock: %p.\n");
+            fprintf(stderr, "warn: dead lock may occur, lock: %p.\n", lock);
             break;
         }
     }                                                           
