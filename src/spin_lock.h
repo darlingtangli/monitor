@@ -1,7 +1,7 @@
 /**
  * @file spin_lock.h
  * @brief 用户态自旋锁简单实现
- * @author litang
+ * @author darlingtangli@gmail.com
  * @version 1.0
  * @date 2016-05-12
  */

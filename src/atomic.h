@@ -1,7 +1,7 @@
 /**
  * @file atomic.h
  * @brief 原子操作函数
- * @author litang
+ * @author darlingtangli@gmail.com
  * @version 1.0
  * @date 2016-05-17
  */

@@ -1,7 +1,7 @@
 /**
  * @file hash_map.h
  * @brief hash map简单实现，用于提高查询metric在共享内存中的下标时的效率
- * @author litang
+ * @author darlingtangli@gmail.com
  * @version 1.0
  * @date 2016-06-13
  */

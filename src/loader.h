@@ -1,7 +1,7 @@
 /**
  * @file loader.h
  * @brief api加载/卸载
- * @author litang
+ * @author darlingtangli@gmail.com
  * @version 1.0
  * @date 2016-05-13
  */
