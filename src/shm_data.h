@@ -10,6 +10,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define MAX_NAME_LEN 64
 
 #pragma pack(1)
@@ -84,5 +88,9 @@ typedef struct entry_s {
 #define moni_get_head(addr) ((moni_head_t*)addr)
 
 #define moni_get_entry(addr, index) (&((moni_entry_t*)((char*)addr+(((moni_head_t*)addr)->offset)))[index])
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __SHM_DATA_H

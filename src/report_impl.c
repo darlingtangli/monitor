@@ -134,19 +134,16 @@ void moni_report_call(const char* metric,
     moni_atomic_add(&entry->data.record.call.count, 1);
     // succ exception
     switch (status) {
-        case MCS_SUCC: {
+        case MCS_SUCC: 
             moni_atomic_add(&entry->data.record.call.succ, 1);
             break;
-        }
-        case MCS_EXCEPTION: {
+        case MCS_EXCEPTION: 
             moni_atomic_add(&entry->data.record.call.exception, 1);
             break;
-        }
-        case MCS_FAILED: {
+        case MCS_FAILED: 
             // nothing to do 
             // failed = count - succ - exception
             break;
-        }
     }
     // cost_us
     moni_atomic_add(&entry->data.record.call.cost_us, cost_us);
